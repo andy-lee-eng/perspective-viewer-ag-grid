@@ -1,0 +1,108 @@
+/******************************************************************************
+ *
+ * Copyright (c) 2017, the Perspective Authors.
+ *
+ * This file is part of the Perspective library, distributed under the terms of
+ * the Apache License 2.0.  The full license can be found in the LICENSE file.
+ *
+ */
+@sans-serif-fonts: Arial, sans-serif;
+@import (inline) "../../node_modules/ag-grid-community/dist/styles/ag-grid.css";
+@import (inline) "../../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css";
+@import (inline) "../../node_modules/ag-grid-community/dist/styles/ag-theme-balham-dark.css";
+:host {
+    #container {
+         position: absolute;
+         left: 0;
+         top: 0;
+         right: 0;
+         bottom: 0;
+         padding: 15px;
+         overflow: auto;
+
+         // example using themes
+         background: var(--aggrid-plugin-background, rgb(250, 250, 250));
+
+         &::after {
+            content: var(--aggrid-container-style, "light");
+            visibility: hidden;
+         }
+
+        & .grid-positive {
+            color: var(--aggrid-number-positive, #016bc6);
+            font-weight: 600;
+        }
+        & .grid-negative {
+            color: var(--aggrid-number-negative, #fe8080);
+            font-weight: 600;
+        }
+
+        & .ag-row, & .ag-cell {
+            border: none;
+        }
+
+        & .row-title-cell {
+            & span {
+                vertical-align: bottom;
+            }
+        }
+
+        & .row-title {
+            display: inline-block;
+            box-sizing: border-box;
+            min-width: 15px;
+            height: 100%;
+
+            &.total-node {
+                height: 50%;
+                border-right: 1px solid var(--aggrid-title-line, rgb(220, 220, 220));
+            }
+
+            &.parent-node {
+                height: 50%;
+                border-right: 1px solid var(--aggrid-title-line, rgb(220, 220, 220));
+                border-top: 1px solid var(--aggrid-title-line, rgb(220, 220, 220));
+            }
+
+            &.parent-node, &.total-node {
+                position: relative;
+                &::after {
+                    content: " ";
+                    position: absolute;
+                    top: -3px;
+                    right: -4px;
+                    width: 6px;
+                    height: 6px;
+                    border: 1px solid var(--aggrid-title-parent, rgb(150, 150, 150));
+                    border-radius: 4px;
+                    background-color: var(--aggrid-title-parent, rgb(150, 150, 150));
+                }
+
+                &.collapsed {
+                    border-right: none;
+                    &::after {
+                        background-color: var(--aggrid-plugin-background, rgb(250, 250, 250));
+                    }
+                }
+            }
+
+            &.branch {
+                border-right: 1px solid var(--aggrid-title-line, rgb(220, 220, 220));
+                &.last {
+                    vertical-align: top;
+                    height: 50%;
+                }
+            }
+
+            &.node {
+                height: 50%;
+                border-top: 1px solid var(--aggrid-title-line, rgb(220, 220, 220));
+            }
+
+            &.name {
+                padding-left: 10px;
+            }
+        }
+    }
+ }
+ 
