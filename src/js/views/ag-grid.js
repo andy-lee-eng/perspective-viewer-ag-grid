@@ -7,7 +7,7 @@
  *
  */
 
-import { Grid } from "ag-grid-community";
+import {Grid} from "ag-grid-community";
 
 const collapsedRows = [];
 const isCollapsed = title => collapsedRows.some(r => title.join("|") === r.join("|"));
@@ -35,86 +35,86 @@ function agGrid(container, settings) {
                     }
                 }
             });
-    };
+    }
 
     const filtered = {
         data: null
     };
 
     const onSetData = () => {
-        filtered.data = settings.data.filter(r => 
-            !isHidden(r.__ROW_PATH__)
-        );
+        filtered.data = settings.data.filter(r => !isHidden(r.__ROW_PATH__));
         gridOptions.api.setRowData(filtered.data);
     };
 
-    gridOptions.columnDefs = getRowHeaders(settings.row_pivots, filtered, onSetData)
-        .concat(getColumnHeaders(colSplits, settings.schema));
+    gridOptions.columnDefs = getRowHeaders(settings.row_pivots, filtered, onSetData).concat(getColumnHeaders(colSplits, settings.schema));
 
     // create the grid passing in the div to use together with the columns & data we want to use
     const style = getComputedStyle(container, "::after");
-    container.className = (style.content == `"dark"`) ? "ag-theme-balham-dark" : "ag-theme-balham";
+    container.className = style.content == `"dark"` ? "ag-theme-balham-dark" : "ag-theme-balham";
     new Grid(container, gridOptions);
 
     onSetData();
 }
 
 const getRowHeaders = (rowTitles, filtered, onToggle) => {
-    return [{
-        headerName: "",
-        field: "__ROW_PATH__",
-        cellClass: "row-title-cell",
-        cellRenderer: ({eGridCell, value, rowIndex}) => {
-            const span = (className, value = "&nbsp;") => `<span class="row-title ${className}">${value}</span>`;
-            const sanitize = str => {
-                eGridCell.textContent = str;
-                const encoded = eGridCell.innerHTML;
-                eGridCell.textContent = "";
-                return encoded;
-            };
+    return [
+        {
+            headerName: "",
+            field: "__ROW_PATH__",
+            cellClass: "row-title-cell",
+            cellRenderer: ({eGridCell, value, rowIndex}) => {
+                const span = (className, value = "&nbsp;") => `<span class="row-title ${className}">${value}</span>`;
+                const sanitize = str => {
+                    eGridCell.textContent = str;
+                    const encoded = eGridCell.innerHTML;
+                    eGridCell.textContent = "";
+                    return encoded;
+                };
 
-            if (value.length) {
-                return ["", ""].concat(value).map((v, i) => {
-                    const offset = value.length + 1 - i;
-                    switch (offset) {
-                        case 0:
-                            return span("name", sanitize(v));
-                        case 1:
-                            if (value.length < rowTitles.length) {
-                                return isCollapsed(value) ? span("parent-node collapsed") : span("parent-node");
-                            } else {
-                                return span("node");
+                if (value.length) {
+                    return ["", ""]
+                        .concat(value)
+                        .map((v, i) => {
+                            const offset = value.length + 1 - i;
+                            switch (offset) {
+                                case 0:
+                                    return span("name", sanitize(v));
+                                case 1:
+                                    if (value.length < rowTitles.length) {
+                                        return isCollapsed(value) ? span("parent-node collapsed") : span("parent-node");
+                                    } else {
+                                        return span("node");
+                                    }
+                                default: {
+                                    if (offset === 2 && (rowIndex >= filtered.data.length - 1 || filtered.data[rowIndex + 1].__ROW_PATH__.length < value.length)) {
+                                        return span("branch last");
+                                    }
+
+                                    return span("branch");
+                                }
                             }
-                        default:
-                        {
-                            if (offset === 2
-                                && (rowIndex >= filtered.data.length - 1 || filtered.data[rowIndex + 1].__ROW_PATH__.length < value.length)) {
-                                return span("branch last");
-                            }
-                
-                            return span("branch");
-                        }
-                    }
-                }).join("");
+                        })
+                        .join("");
+                }
+                eGridCell.innerHTML = `${span("total-node")}${span("name", "TOTAL")}`;
+            },
+            onCellClicked: ({value}) => {
+                if (value.length === 0) return;
+
+                const index = collapsedRows.findIndex(r => value.join("|") == r.join("|"));
+                if (index !== -1) {
+                    collapsedRows.splice(index, 1);
+                } else {
+                    collapsedRows.push(value);
+                }
+                onToggle();
             }
-            eGridCell.innerHTML = `${span("total-node")}${span("name", "TOTAL")}`;
-        },
-        onCellClicked: ({value}) => {
-            if (value.length === 0) return;
-            
-            const index = collapsedRows.findIndex(r => value.join("|") == r.join("|"));
-            if (index !== -1) {
-                collapsedRows.splice(index, 1);
-            } else {
-                collapsedRows.push(value);
-            }
-            onToggle();
         }
-    }];
+    ];
 };
 
 const getColumnHeaders = (columns, schema) => {
-    const headers = { children: [] };
+    const headers = {children: []};
 
     const findOrAddColumn = (parent, split) => {
         const childName = split[0];
@@ -125,17 +125,17 @@ const getColumnHeaders = (columns, schema) => {
                 headerName: childName,
                 children: rest.length ? [] : undefined,
                 width: 100,
-                valueFormatter: ({ value }) => {
+                valueFormatter: ({value}) => {
                     if (value) {
                         switch (schema[childName]) {
                             case "float":
                             case "integer":
-                                return value.toLocaleString(undefined, { style: "decimal" });
+                                return value.toLocaleString(undefined, {style: "decimal"});
                         }
                     }
                     return value;
                 },
-                cellClass: ({ value }) => value < 0 ? "grid-negative" : "grid-positive"
+                cellClass: ({value}) => (value < 0 ? "grid-negative" : "grid-positive")
             };
             parent.children.push(child);
         }
