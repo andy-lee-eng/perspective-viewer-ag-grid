@@ -47,6 +47,7 @@ function agGrid(container, settings) {
     };
 
     gridOptions.columnDefs = getRowHeaders(settings.row_pivots, filtered, onSetData).concat(getColumnHeaders(colSplits, settings.schema));
+    handleCellClicks(container, settings, gridOptions.columnDefs);
 
     // create the grid passing in the div to use together with the columns & data we want to use
     const style = getComputedStyle(container, "::after");
@@ -153,6 +154,48 @@ const getColumnHeaders = (columns, schema) => {
     });
 
     return headers.children;
+};
+
+const handleCellClicks = (container, settings, columnDefs) => {
+    const handleClick = columns => {
+        columns.forEach(col => {
+            const oldHandler = col.onCellClicked;
+            col.onCellClicked = (...args) => {
+                if (oldHandler) oldHandler(...args);
+                const {colDef, data} = args[0];
+                raiseEvent(colDef, data);
+            };
+
+            if (col.children) {
+                handleClick(col.children);
+            }
+        });
+    };
+
+    const raiseEvent = (colDef, data) => {
+        const column_names = [colDef.headerName.length ? colDef.headerName : colDef.field];
+        const groupFilters = data.__ROW_PATH__.map((label, i) => [settings.row_pivots[i], "==", label]);
+        const splitFilters = colDef.field
+            .split("|")
+            .slice(0, -1)
+            .map((label, i) => [settings.col_pivots[i], "==", label]);
+
+        const filters = settings.filter.concat(groupFilters).concat(splitFilters);
+
+        container.dispatchEvent(
+            new CustomEvent("perspective-click", {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    column_names,
+                    config: {filters},
+                    row: data
+                }
+            })
+        );
+    };
+
+    handleClick(columnDefs);
 };
 
 agGrid.plugin = {

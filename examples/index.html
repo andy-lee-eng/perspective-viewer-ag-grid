@@ -16,9 +16,8 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 
     <script src="/perspective.view.js"></script>
-    <script src="/hypergrid.plugin.js"></script>
-    <script src="/highcharts.plugin.js"></script>
     <script src="/template.plugin.js"></script>
+    <script src="/d3fc.plugin.js"></script>
 
     <script src="/perspective.js"></script>
 
@@ -61,8 +60,13 @@
             }
             xhr.send(null);
         });
-    </script>
 
+        document.querySelector('.example')
+            .addEventListener("perspective-click", function(event) {
+                console.log("Event from perspective-viewer", event.detail);
+            });
+    </script>
+    <script src="theme-toggle.js"></script>
 </body>
 
 </html>
