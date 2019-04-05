@@ -8,6 +8,7 @@
  */
 
 import {Grid} from "ag-grid-community";
+import {getStyle} from "../style/theme";
 
 const collapsedRows = [];
 const isCollapsed = title => collapsedRows.some(r => title.join("|") === r.join("|"));
@@ -50,8 +51,7 @@ function agGrid(container, settings) {
     handleCellClicks(container, settings, gridOptions.columnDefs);
 
     // create the grid passing in the div to use together with the columns & data we want to use
-    const style = getComputedStyle(container, "::after");
-    container.className = style.content == `"dark"` ? "ag-theme-balham-dark" : "ag-theme-balham";
+    container.className = getStyle(container, "--aggrid-theme") || "ag-theme-balham";
     new Grid(container, gridOptions);
 
     onSetData();

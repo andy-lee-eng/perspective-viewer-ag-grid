@@ -8,8 +8,11 @@
  */
 
 import {bindTemplate} from "@jpmorganchase/perspective-viewer/cjs/js/utils";
+import {getStyle, getThemeStyles} from "../style/theme";
 import style from "../../less/plugin.less";
 import {name} from "../../../package.json";
+
+import "./polyfills";
 
 const template = `<template id="${name}"><div id="container"></div></template>`;
 
@@ -17,11 +20,28 @@ const template = `<template id="${name}"><div id="container"></div></template>`;
 class TemplateElement extends HTMLElement {
     connectedCallback() {
         this._container = this.shadowRoot.querySelector("#container");
+        this.themes = [];
     }
 
     render(view, settings) {
         this._container.innerHTML = "";
+        this.importThemeStyle();
         view(this._container, settings);
+    }
+
+    importThemeStyle() {
+        const themeName = getStyle(this._container, "--aggrid-theme");
+        if (themeName && !this.themes.includes(themeName)) {
+            getThemeStyles(themeName).then(themeStyles => {
+                if (themeStyles) {
+                    const style = document.createElement("style");
+                    style.innerHTML = themeStyles;
+                    this.shadowRoot.appendChild(style);
+                }
+            });
+
+            this.themes.push(themeName);
+        }
     }
 
     resize() {

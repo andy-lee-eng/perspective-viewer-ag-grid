@@ -9,7 +9,7 @@
 @sans-serif-fonts: Arial, sans-serif;
 @import (inline) "../../node_modules/ag-grid-community/dist/styles/ag-grid.css";
 @import (inline) "../../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css";
-@import (inline) "../../node_modules/ag-grid-community/dist/styles/ag-theme-balham-dark.css";
+
 :host {
     #container {
          position: absolute;
@@ -22,11 +22,6 @@
 
          // example using themes
          background: var(--aggrid-plugin-background, rgb(250, 250, 250));
-
-         &::after {
-            content: var(--aggrid-container-style, "light");
-            visibility: hidden;
-         }
 
         & .grid-positive {
             color: var(--aggrid-number-positive, #016bc6);
