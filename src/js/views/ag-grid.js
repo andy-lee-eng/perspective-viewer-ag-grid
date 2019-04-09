@@ -29,11 +29,8 @@ function agGrid(container, settings) {
         Object.keys(settings.data[0])
             .filter(key => key !== "__ROW_PATH__")
             .forEach(c => {
-                const split = c.split("|");
-                if (!settings.hidden.includes(split[split.length - 1])) {
-                    if (!colSplits.includes(c)) {
-                        colSplits.push(c);
-                    }
+                if (!colSplits.includes(c)) {
+                    colSplits.push(c);
                 }
             });
     }
@@ -47,7 +44,7 @@ function agGrid(container, settings) {
         gridOptions.api.setRowData(filtered.data);
     };
 
-    gridOptions.columnDefs = getRowHeaders(settings.row_pivots, filtered, onSetData).concat(getColumnHeaders(colSplits, settings.schema));
+    gridOptions.columnDefs = getRowHeaders(settings.row_pivot, filtered, onSetData).concat(getColumnHeaders(colSplits, settings.tschema));
     handleCellClicks(container, settings, gridOptions.columnDefs);
 
     // create the grid passing in the div to use together with the columns & data we want to use
@@ -114,7 +111,7 @@ const getRowHeaders = (rowTitles, filtered, onToggle) => {
     ];
 };
 
-const getColumnHeaders = (columns, schema) => {
+const getColumnHeaders = (columns, tschema) => {
     const headers = {children: []};
 
     const findOrAddColumn = (parent, split) => {
@@ -128,7 +125,7 @@ const getColumnHeaders = (columns, schema) => {
                 width: 100,
                 valueFormatter: ({value}) => {
                     if (value) {
-                        switch (schema[childName]) {
+                        switch (tschema[childName]) {
                             case "float":
                             case "integer":
                                 return value.toLocaleString(undefined, {style: "decimal"});
@@ -174,11 +171,11 @@ const handleCellClicks = (container, settings, columnDefs) => {
 
     const raiseEvent = (colDef, data) => {
         const column_names = [colDef.headerName.length ? colDef.headerName : colDef.field];
-        const groupFilters = data.__ROW_PATH__.map((label, i) => [settings.row_pivots[i], "==", label]);
+        const groupFilters = data.__ROW_PATH__.map((label, i) => [settings.row_pivot[i], "==", label]);
         const splitFilters = colDef.field
             .split("|")
             .slice(0, -1)
-            .map((label, i) => [settings.col_pivots[i], "==", label]);
+            .map((label, i) => [settings.column_pivot[i], "==", label]);
 
         const filters = settings.filter.concat(groupFilters).concat(splitFilters);
 
